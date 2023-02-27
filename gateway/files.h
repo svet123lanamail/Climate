@@ -1,0 +1,123 @@
+#pragma once
+
+const PROGMEM char indexPage[] = R"(
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Таблицы</title>
+  <style>
+    body {
+      margin: 1%;
+    }
+    table {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      border-collapse: collapse;
+      width: 300px;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 4px;
+      min-width: 160px;
+    }
+    .btn {
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    .legend-vertical {
+      text-align: left;
+      background: #F8D298;
+    }
+    .legend-horizontal {
+      text-align: center;
+      background: #F8D298;
+    }
+    .cell-data {
+      text-align: center;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="tbl-container">
+    <table>
+      <tr>
+        <th class="legend-vertical">Температура</th>
+        <td class="cell-data">Данные 1</td>
+      </tr>
+      <tr>
+        <th class="legend-vertical">Влажность</th>
+        <td class="cell-data">Данные 2</td>
+      </tr>
+      <tr>
+        <th class="legend-vertical">Наличие воды</th>
+        <td class="cell-data">Данные 3</td>
+      </tr>
+    </table>
+  </div>
+  <button type="button" class="btn" onclick="let tbl = document.getElementById('hist-tbl'); tbl.hidden = !tbl.hidden">Показать историю измерений</button>
+  <div id="hist-tbl-container">
+    <table id="hist-tbl" hidden="true">
+      <tr class="legend-horizontal">
+        <th>Адрес станции</th>
+        <th>Время</th>
+        <th>Измерение</th>
+        <th>Значение</th>
+      </tr>
+      <tbody id="tbl-body">
+        <tr>
+          <td class="cell-data">Данные 1</td>
+          <td class="cell-data">Данные 2</td>
+          <td class="cell-data">Данные 3</td>
+          <td class="cell-data">Данные 4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <script>
+    setInterval(getData, 5000);
+    setInterval(getHistory, 10000);
+    const xhr = new XMLHttpRequest();
+    const requestURL1 = '/measurements.xml';
+    const requestURL2 = '/getMeasurements.xml';
+
+    function getData() {
+      xhr.open('GET', requestURL1);
+      xhr.onload = () => {
+        if (xhr.status !== 200) {
+          document.getElementById('tbl-container').innerHTML = "No data";
+          return;
+        }
+        document.getElementById('tbl-container').innerHTML = xhr.response;
+      }
+      xhr.onerror = () => {
+        document.getElementById('tbl-container').innerHTML = "Fatal Error";
+      };
+      xhr.send();
+    }
+    function getHistory() {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', requestURL2);
+      xhr.onload = () => {
+        if (xhr.status !== 200) {
+          document.getElementById('tbl-body').innerHTML = "No data";
+          return;
+        }
+        document.getElementById('tbl-body').innerHTML = xhr.response;
+      }
+      xhr.onerror = () => {
+        document.getElementById('tbl-body').innerHTML = "Fatal Error";
+      };
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
+)";
+
+const PROGMEM char tableFile[] = "aboba";
+const PROGMEM char taskFile[] = R"("dfdf")";
+const PROGMEM char tablePage[] = R"(
+<table><tr><th class="legend-vertical">Температура</th><td class="cell-data">%s</td></tr><tr><th class="legend-vertical">Влажность</th><td class="cell-data">%s%%</td></tr><th class="legend-vertical">Наличие воды</th><td class="cell-data">%s</td></tr></table>
+)";
